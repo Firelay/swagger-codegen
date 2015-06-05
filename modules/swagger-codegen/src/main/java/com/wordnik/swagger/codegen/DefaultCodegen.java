@@ -210,6 +210,7 @@ public class DefaultCodegen {
     typeMapping.put("float", "Float");
     typeMapping.put("number", "BigDecimal");
     typeMapping.put("DateTime", "Date");
+    typeMapping.put("datetime", "Date");
     typeMapping.put("long", "Long");
     typeMapping.put("short", "Short");
     typeMapping.put("char", "String");
