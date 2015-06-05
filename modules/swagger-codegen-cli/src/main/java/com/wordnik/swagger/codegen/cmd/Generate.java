@@ -60,6 +60,18 @@ public class Generate implements Runnable {
                     "Pass in arguments in the following format <username>:<password>")
     private String basicAuth;
 
+    @Option(name = {"-V", "--version"}, title = "version",
+            description = "sets the version in the pom.xml")
+    private String artifactVersion;
+    
+    @Option(name = {"-g", "--groupId"}, title = "groupId",
+            description = "sets the groupId in the pom.xml")
+    private String groupId;
+    
+    @Option(name = {"-A", "--artifactId"}, title = "artifactId",
+            description = "sets the artifactId in the pom.xml")
+    private String artifactId;
+
     @Override
     public void run() {
         verbosed(verbose);
@@ -80,6 +92,20 @@ public class Generate implements Runnable {
 
         if (null != templateDir) {
             config.additionalProperties().put(TEMPLATE_DIR_PARAM, new File(templateDir).getAbsolutePath());
+        }
+
+    
+   
+        if (null != artifactVersion) {
+            config.additionalProperties().put("artifactVersion", artifactVersion);
+        }
+
+        if (null != artifactId) {
+            config.additionalProperties().put("artifactId", artifactId);
+        }
+
+        if (null != groupId) {
+            config.additionalProperties().put("groupId", groupId);
         }
 
         input.setConfig(config);
