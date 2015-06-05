@@ -71,6 +71,30 @@ public class Generate implements Runnable {
     @Option(name = {"-A", "--artifactId"}, title = "artifactId",
             description = "sets the artifactId in the pom.xml")
     private String artifactId;
+    
+    @Option(name = {"-pa", "--parentArtifactId"}, title = "parentArtifactId",
+            description = "sets the parentArtifactId in the pom.xml")
+    private String parentArtifactId;
+
+    @Option(name = {"-pv", "--parentVersion"}, title = "parentVersion",
+            description = "sets the parentVersion in the pom.xml")
+    private String parentVersion;
+    
+    @Option(name = {"-pg", "--parentGroupId"}, title = "parentGroupId",
+            description = "sets the parentGroupId in the pom.xml")
+    private String parentGroupId;
+
+    @Option(name = {"-c", "--connection"}, title = "connection",
+            description = "sets the connection in the pom.xml")
+    private String connection;
+
+    @Option(name = {"-d", "--developerConnection"}, title = "developerConnection",
+            description = "sets the developerConnection in the pom.xml")
+    private String developerConnection;
+
+    @Option(name = {"-u", "--url"}, title = "url",
+            description = "sets the url in the pom.xml")
+    private String url;
 
     @Override
     public void run() {
@@ -107,6 +131,29 @@ public class Generate implements Runnable {
         if (null != groupId) {
             config.additionalProperties().put("groupId", groupId);
         }
+
+        if (null != parentVersion && null != parentGroupId && null != parentArtifactId){
+            config.additionalProperties().put("parentVersion", parentVersion);
+            config.additionalProperties().put("parentGroupId", parentGroupId);
+            config.additionalProperties().put("parentArtifactId", parentArtifactId);
+            config.additionalProperties().put("parent", "true");
+        } else {
+            config.additionalProperties().put("parent", null);
+        }
+
+        if (null != connection) {
+            config.additionalProperties().put("connection", connection);
+        }
+
+        if (null != developerConnection) {
+            config.additionalProperties().put("developerConnection", developerConnection);
+        }
+
+        if (null != url) {
+            config.additionalProperties().put("url", url);
+        }
+
+
 
         input.setConfig(config);
 

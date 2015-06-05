@@ -12,6 +12,13 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
   protected String artifactId = "swagger-java-client";
   protected String artifactVersion = "1.0.0";
   protected String sourceFolder = "src/main/java";
+  protected String parentGroupId = "io.swagger";
+  protected String parentArtifactId = "parent";
+  protected String parentVersion = "1.0.0";
+  protected String parent = null;
+  protected String connection = "scm:git:git@github.com:wordnik/swagger-mustache.git";
+  protected String developerConnection = "scm:git:git@github.com:wordnik/swagger-codegen.git";
+  protected String url = "https://github.com/wordnik/swagger-codegen";
 
   public CodegenType getTag() {
     return CodegenType.CLIENT;
@@ -49,6 +56,13 @@ public class JavaClientCodegen extends DefaultCodegen implements CodegenConfig {
     additionalProperties.put("groupId", groupId);
     additionalProperties.put("artifactId", artifactId);
     additionalProperties.put("artifactVersion", artifactVersion);
+    additionalProperties.put("parentVersion", parentVersion);
+    additionalProperties.put("parentGroupId", parentGroupId);
+    additionalProperties.put("parentArtifactId", parentArtifactId);
+    additionalProperties.put("parent", parent);
+    additionalProperties.put("connection", connection);
+    additionalProperties.put("developerConnection", developerConnection);
+    additionalProperties.put("url", url);
 
     supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
     supportingFiles.add(new SupportingFile("apiInvoker.mustache", 

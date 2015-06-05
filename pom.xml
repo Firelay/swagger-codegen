@@ -6,10 +6,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.wordnik</groupId>
-  <artifactId>swagger-codegen-project-firelay</artifactId>
+  <artifactId>swagger-codegen-project</artifactId>
   <packaging>pom</packaging>
   <name>swagger-codegen-project</name>
-  <version>2.1.0-M2-1.0.SNASPSHOT</version>
+  <version>2.1.0-M2-1.0-SNAPSHOT</version>
   <url>https://github.com/swagger-api/swagger-codegen</url>
   <scm>
     <connection>scm:git:git@github.com:swagger-api/swagger-codegen.git</connection>
@@ -436,6 +436,18 @@
       </snapshots>
     </repository>
   </repositories>
+   <distributionManagement>
+    <repository>
+      <id>proteon-releases</id>
+      <name>Proteon Releases</name>
+      <url>https://nexus.proteon.nl/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>proteon-snapshots</id>
+      <name>Proteon Snapshots</name>
+      <url>https://nexus.proteon.nl/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
   <properties>
     <swagger-parser-version>1.0.5</swagger-parser-version>
     <scala-version>2.10.4</scala-version>

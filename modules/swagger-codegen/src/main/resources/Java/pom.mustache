@@ -1,5 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+{{#parent}}
+  <parent>
+    <groupId>{{parentGroupId}}</groupId>
+    <artifactId>{{parentArtifactId}}</artifactId>
+    <version>{{parentVersion}}</version>
+  </parent>
+{{/parent}}
   <modelVersion>4.0.0</modelVersion>
   <groupId>{{groupId}}</groupId>
   <artifactId>{{artifactId}}</artifactId>
@@ -7,9 +14,9 @@
   <name>{{artifactId}}</name>
   <version>{{artifactVersion}}</version>
   <scm>
-    <connection>scm:git:git@github.com:wordnik/swagger-mustache.git</connection>
-    <developerConnection>scm:git:git@github.com:wordnik/swagger-codegen.git</developerConnection>
-    <url>https://github.com/wordnik/swagger-codegen</url>
+    <connection>{{connection}}</connection>
+    <developerConnection>{{developerConnection}}</developerConnection>
+    <url>{{url}}</url>
   </scm>
   <prerequisites>
     <maven>2.2.0</maven>
@@ -17,6 +24,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -52,7 +60,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.2</version>s
         <executions>
           <execution>
             <goals>
@@ -147,7 +155,11 @@
       <artifactId>joda-time</artifactId>
       <version>${jodatime-version}</version>
     </dependency>
-
+      <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-codegen-cli</artifactId>
+      <version>2.1.0-M2-1.0-SNAPSHOT</version>
+    </dependency>
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
