@@ -40,4 +40,8 @@ public class CodegenParameter {
 
     return output;
   }
+
+  public boolean equals(Object o){
+    return (o != null && (o instanceof CodegenParameter) && (((CodegenParameter)o).paramName.equals(this.paramName)));
+  }
 }
