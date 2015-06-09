@@ -160,14 +160,15 @@
           <artifactId>scala-maven-plugin</artifactId>
           <version>${scala-maven-plugin-version}</version>
         </plugin>
-        <!--<plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <configuration>
             <releaseProfiles>release</releaseProfiles>
             <goals>sign</goals>
+            <skip>true</skip>
           </configuration>
-        </plugin>-->
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -261,7 +262,7 @@
       </activation>
       <build>
         <plugins>
-          <!--<plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
             <executions>
@@ -273,7 +274,10 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>-->
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
