@@ -5,16 +5,17 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.multipart.FormDataMultiPart;
-
-import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
+
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import java.util.Collection;
 import java.util.Map;
@@ -179,7 +180,7 @@ public class ApiInvoker {
     }
     String querystring = b.toString();
 
-    Builder builder = client.resource(host + path + querystring).accept("application/json");
+    Builder builder = (Builder) client.target(host + path + querystring).request("application/json");
     for(String key : headerParams.keySet()) {
       builder = builder.header(key, headerParams.get(key));
     }
@@ -189,23 +190,29 @@ public class ApiInvoker {
         builder = builder.header(key, defaultHeaderMap.get(key));
       }
     }
-    ClientResponse response = null;
+    Response response = null;
 
     if("GET".equals(method)) {
-      response = (ClientResponse) builder.get(ClientResponse.class);
+      response = builder.get();
     }
     else if ("POST".equals(method)) {
-      if(body == null)
-        response = builder.post(ClientResponse.class, null);
-      else if(body instanceof FormDataMultiPart) {
-        response = builder.type(contentType).post(ClientResponse.class, body);
+      if(body == null){
+        if(formParams.isEmpty()){
+        response = builder.post(null);
+        } else {
+          MultivaluedHashMap<String, String> form = new MultivaluedHashMap<String, String>(formParams);
+          Entity entity = Entity.form(form);
+          response = builder.post(entity);
+        }
+      } else if(body instanceof FormDataMultiPart) {
+        response = builder.post(Entity.entity(body, ((FormDataMultiPart) body).getMediaType()));
       }
       else
-        response = builder.type(contentType).post(ClientResponse.class, serialize(body));
+        response = builder.post(Entity.json(serialize(body)));
     }
     else if ("PUT".equals(method)) {
       if(body == null)
-        response = builder.put(ClientResponse.class, serialize(body));
+        response = builder.put(Entity.json(serialize(body)));
       else {
         if("application/x-www-form-urlencoded".equals(contentType)) {
           StringBuilder formParamBuilder = new StringBuilder();
@@ -225,29 +232,31 @@ public class ApiInvoker {
               }
             }
           }
-          response = builder.type(contentType).put(ClientResponse.class, formParamBuilder.toString());
+          Entity entity = Entity.entity(formParamBuilder.toString(), MediaType.APPLICATION_FORM_URLENCODED);
+          response = builder.put(entity);
         }
-        else
-          response = builder.type(contentType).put(ClientResponse.class, serialize(body));
+        else {
+          Entity entity = Entity.json(body);
+          response = builder.put(entity);
+        }
       }
     }
     else if ("DELETE".equals(method)) {
       if(body == null)
-        response = builder.delete(ClientResponse.class);
+        response = builder.delete(Response.class);
       else
-        response = builder.type(contentType).delete(ClientResponse.class, serialize(body));
+        response = builder.delete();
     }
     else {
       throw new ApiException(500, "unknown method type " + method);
     }
-    if(response.getClientResponseStatus() == ClientResponse.Status.NO_CONTENT) {
+    if(response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
       return null;
     }
-    else if(response.getClientResponseStatus().getFamily() == Family.SUCCESSFUL) {
+    else if(Response.Status.fromStatusCode(response.getStatus()).getFamily() == Family.SUCCESSFUL) {
       if(response.hasEntity()) {
-        return (String) response.getEntity(String.class);
-      }
-      else {
+        return response.readEntity(String.class);
+      } else {
         return "";
       }
     }
@@ -255,23 +264,23 @@ public class ApiInvoker {
       String message = "error";
       if(response.hasEntity()) {
         try{
-          message = String.valueOf(response.getEntity(String.class));
+          message = response.readEntity(String.class);
         }
         catch (RuntimeException e) {
           // e.printStackTrace();
         }
       }
       throw new ApiException(
-                response.getClientResponseStatus().getStatusCode(),
+                response.getStatus(),
                 message);
     }
   }
 
   private Client getClient(String host) {
     if(!hostMap.containsKey(host)) {
-      Client client = Client.create();
+      Client client = ClientBuilder.newClient();
       if(isDebug)
-        client.addFilter(new LoggingFilter());
+        client.register(new LoggingFilter());
       hostMap.put(host, client);
     }
     return hostMap.get(host);
