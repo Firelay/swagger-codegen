@@ -76,6 +76,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${build.plugins.plugin.version}</version>
         <executions>
           <execution>
             <id>add_sources</id>
@@ -148,7 +149,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
-      <version>2.1.5</version>
+      <version>${jackson-version}</version>
     </dependency>   
     <dependency>
       <groupId>joda-time</groupId>
@@ -170,5 +171,6 @@
     <jodatime-version>2.3</jodatime-version>
     <maven-plugin-version>1.0.0</maven-plugin-version>
     <junit-version>4.8.1</junit-version>
+    <build.plugins.plugin.version>1.9.1</build.plugins.plugin.version>
   </properties>
 </project>
