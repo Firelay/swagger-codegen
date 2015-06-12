@@ -195,8 +195,30 @@ public class ApiInvoker {
       response = (ClientResponse) builder.get(ClientResponse.class);
     }
     else if ("POST".equals(method)) {
-      if(body == null)
-        response = builder.post(ClientResponse.class, null);
+      if(body == null){
+        if(formParams.isEmpty()){
+          response = builder.post(ClientResponse.class, null);
+        } else {
+          StringBuilder formParamBuilder = new StringBuilder();
+
+          // encode the form params
+          for(String key : formParams.keySet()) {
+            String value = formParams.get(key);
+            if(value != null && !"".equals(value.trim())) {
+              if(formParamBuilder.length() > 0) {
+                formParamBuilder.append("&");
+              }
+              try {
+                formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
+              }
+              catch (Exception e) {
+                // move on to next
+              }
+            }
+          }
+          response = builder.type("application/x-www-form-urlencoded").post(ClientResponse.class, formParamBuilder.toString());
+        }
+      }
       else if(body instanceof FormDataMultiPart) {
         response = builder.type(contentType).post(ClientResponse.class, body);
       }
