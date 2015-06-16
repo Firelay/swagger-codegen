@@ -1,28 +1,57 @@
 package {{invokerPackage}};
 
+/**
+ * 
+ * Exception class for exceptions for api messages.
+ *
+ */
 public class ApiException extends Exception {
   int code = 0;
   String message = null;
 
+  /**
+   * empty constructor.
+   */
   public ApiException() {}
 
+  /**
+   * constructor with code and message.
+   * @param code the code
+   * @param message the message
+   */
   public ApiException(int code, String message) {
     this.code = code;
     this.message = message;
   }
 
+  /**
+   * gets  the code for this {@link Exception}.
+   * @return the code
+   */
   public int getCode() {
     return code;
   }
   
+  /**
+   * sets  the code for this {@link Exception}.
+   * @param code the code
+   */
   public void setCode(int code) {
     this.code = code;
   }
   
+  /**
+   * get the message for this {@link Exception}.
+   * @return the message
+   */
   public String getMessage() {
     return message;
   }
   
+  /**
+   * sets the message for this {@link Exception}.
+   * @param message the message
+   */
   public void setMessage(String message) {
     this.message = message;
   }

@@ -1,12 +1,14 @@
 package {{invokerPackage}};
 
-import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.core.JsonGenerator.Feature;
 
 import com.fasterxml.jackson.datatype.joda.*;
 
+/**
+ * 
+ * helper class that sets up the ObjectMapper.
+ *
+ */
 public class JsonUtil {
   public static ObjectMapper mapper;
 
@@ -17,6 +19,10 @@ public class JsonUtil {
 	  mapper.registerModule(new JodaModule());
 	}
 
+    /**
+     *  returns the JsonMapper.
+     * @return the JsonMapper
+     */
 	public static ObjectMapper getJsonMapper() {
 		return mapper;
 	}

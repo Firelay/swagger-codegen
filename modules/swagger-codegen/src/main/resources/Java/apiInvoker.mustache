@@ -1,20 +1,14 @@
 package {{invokerPackage}};
 
-import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.multipart.FormDataMultiPart;
 
 import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.core.MediaType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,8 +23,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
+/**
+ * 
+ * helper class that calls a remote api endpoint.
+ *
+ */
 public class ApiInvoker {
   private static ApiInvoker INSTANCE = new ApiInvoker();
   private Map<String, Client> hostMap = new HashMap<String, Client>();
@@ -58,10 +56,19 @@ public class ApiInvoker {
     setUserAgent("Java-Swagger");
   }
 
+  /**
+   * adds a default user agent header.
+   * @param userAgent the user agent
+   */
   public static void setUserAgent(String userAgent) {
     INSTANCE.addDefaultHeader("User-Agent", userAgent);
   }
 
+  /**
+   * parses a {@link Date} with format yyyy-MM-dd'T'HH:mm:ss.SSSZ from given String.
+   * @param str the string
+   * @return the parsed {@link Date}
+   */
   public static Date parseDateTime(String str) {
     try {
       return DATE_TIME_FORMAT.parse(str);
@@ -70,6 +77,11 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * parses a {@link Date} with format yyyy-MM-dd from given String.
+   * @param str the string
+   * @return the parsed {@link Date}
+   */
   public static Date parseDate(String str) {
     try {
       return DATE_FORMAT.parse(str);
@@ -78,14 +90,29 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * turns a {@link Date} into a String with format yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+   * @param datetime the date
+   * @return the string
+   */
   public static String formatDateTime(Date datetime) {
     return DATE_TIME_FORMAT.format(datetime);
   }
 
+  /**
+   * turns a {@link Date} into a String with format yyyy-MM-dd.
+   * @param date the date
+   * @return the string
+   */
   public static String formatDate(Date date) {
     return DATE_FORMAT.format(date);
   }
 
+  /**
+   * turns an object to a string.
+   * @param param the parameter
+   * @return the string representation of the parameter
+   */
   public static String parameterToString(Object param) {
     if (param == null) {
       return "";
@@ -104,18 +131,35 @@ public class ApiInvoker {
       return String.valueOf(param);
     }
   }
+
+  /**
+   * turns on debug logging.
+   */
   public void enableDebug() {
     isDebug = true;
   }
 
+  /**
+   * @return the instance of this ApiInvoker.
+   */
   public static ApiInvoker getInstance() {
     return INSTANCE;
   }
 
+  /**
+   * adds a default header.
+   * @param key the key
+   * @param value the value
+   */
   public void addDefaultHeader(String key, String value) {
      defaultHeaderMap.put(key, value);
   }
 
+  /**
+   * encodes in utf-8 and espaces \\+ to %20.
+   * @param str the string
+   * @return the escaped string
+   */
   public String escapeString(String str) {
     try{
       return URLEncoder.encode(str, "utf8").replaceAll("\\+", "%20");
@@ -125,6 +169,14 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * turns a json string into an object.
+   * @param json the json string
+   * @param containerType the type of the string(list/array turns the result into a {@link List}<cls>)
+   * @param cls the class of the returned object
+   * @return the object
+   * @throws ApiException if something goes wrong
+   */
   public static Object deserialize(String json, String containerType, Class cls) throws ApiException {
     if(null != containerType) {
         containerType = containerType.toLowerCase();
@@ -150,6 +202,12 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * turns an object into a json string.
+   * @param obj the object to serialize
+   * @return the json string
+   * @throws ApiException if something goes wrong
+   */
   public static String serialize(Object obj) throws ApiException {
     try {
       if (obj != null)
@@ -162,6 +220,19 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * invokes the path on host with given parameters.
+   * @param host the hosturl
+   * @param path the endpoint
+   * @param method the http method
+   * @param queryParams the qeury parameters
+   * @param body the body text
+   * @param headerParams the header parameters
+   * @param formParams the form parameters
+   * @param contentType the content type
+   * @return the result
+   * @throws ApiException if something goes wrong.
+   */
   public String invokeAPI(String host, String path, String method, Map<String, String> queryParams, Object body, Map<String, String> headerParams, Map<String, String> formParams, String contentType) throws ApiException {
     Client client = getClient(host);
 
@@ -199,23 +270,8 @@ public class ApiInvoker {
         if(formParams.isEmpty()){
           response = builder.post(ClientResponse.class, null);
         } else {
-          StringBuilder formParamBuilder = new StringBuilder();
+          StringBuilder formParamBuilder = setFormParams(formParams);
 
-          // encode the form params
-          for(String key : formParams.keySet()) {
-            String value = formParams.get(key);
-            if(value != null && !"".equals(value.trim())) {
-              if(formParamBuilder.length() > 0) {
-                formParamBuilder.append("&");
-              }
-              try {
-                formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
-              }
-              catch (Exception e) {
-                // move on to next
-              }
-            }
-          }
           response = builder.type("application/x-www-form-urlencoded").post(ClientResponse.class, formParamBuilder.toString());
         }
       }
@@ -225,28 +281,22 @@ public class ApiInvoker {
       else
         response = builder.type(contentType).post(ClientResponse.class, serialize(body));
     }
-    else if ("PUT".equals(method)) {
+    else if ("PUT".equals(method) || "PATCH".equals(method)) {
+      if("PATCH".equals(method)){
+        builder.header("X-HTTP-Method-Override", "PATCH");
+      }
       if(body == null)
-        response = builder.put(ClientResponse.class, serialize(body));
+        if(formParams.isEmpty()){
+          response = builder.put(ClientResponse.class, null);
+        } else {
+          StringBuilder formParamBuilder = setFormParams(formParams);
+
+          response = builder.type("application/x-www-form-urlencoded").put(ClientResponse.class, formParamBuilder.toString());
+        }
       else {
         if("application/x-www-form-urlencoded".equals(contentType)) {
-          StringBuilder formParamBuilder = new StringBuilder();
+          StringBuilder formParamBuilder = setFormParams(formParams);
 
-          // encode the form params
-          for(String key : formParams.keySet()) {
-            String value = formParams.get(key);
-            if(value != null && !"".equals(value.trim())) {
-              if(formParamBuilder.length() > 0) {
-                formParamBuilder.append("&");
-              }
-              try {
-                formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
-              }
-              catch (Exception e) {
-                // move on to next
-              }
-            }
-          }
           response = builder.type(contentType).put(ClientResponse.class, formParamBuilder.toString());
         }
         else
@@ -289,6 +339,11 @@ public class ApiInvoker {
     }
   }
 
+  /**
+   * returns a client for given host.
+   * @param host the host url
+   * @return the client
+   */
   private Client getClient(String host) {
     if(!hostMap.containsKey(host)) {
       Client client = Client.create();
@@ -297,5 +352,31 @@ public class ApiInvoker {
       hostMap.put(host, client);
     }
     return hostMap.get(host);
+  }
+
+   /**
+   * builds a string from formparameters in a {@link Map}.
+   * @param formParams the map with parameters
+   * @return the stringbuilder with the parameters
+   */
+  private StringBuilder setFormParams(Map<String, String> formParams){
+    StringBuilder formParamBuilder = new StringBuilder();
+
+    // encode the form params
+    for(String key : formParams.keySet()) {
+      String value = formParams.get(key);
+      if(value != null && !"".equals(value.trim())) {
+        if(formParamBuilder.length() > 0) {
+          formParamBuilder.append("&");
+        }
+        try {
+          formParamBuilder.append(URLEncoder.encode(key, "utf8")).append("=").append(URLEncoder.encode(value, "utf8"));
+        }
+        catch (Exception e) {
+          // move on to next
+        }
+      }
+    }
+    return formParamBuilder;
   }
 }
