@@ -66,12 +66,18 @@ public class {{classname}} {
     {{/queryParams}}
     {{#headerParams}}headerParams.put("{{baseName}}", ApiInvoker.parameterToString({{paramName}}));
     {{/headerParams}}
+    {{#consumes.length}}
     String[] contentTypes = {
       {{#consumes}}"{{mediaType}}"{{#hasMore}},{{/hasMore}}{{/consumes}}
     };
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
+    {{/consumes.length}}
+    {{^consumes.length}}
+    String contentType = "application/json";
+    {{/consumes.length}}
 
+    {{#consumes.length}}
     if(contentType.startsWith("multipart/form-data")) {
       boolean hasFields = false;
       FormDataMultiPart mp = new FormDataMultiPart();
@@ -87,10 +93,12 @@ public class {{classname}} {
         postBody = mp;
     }
     else {
+    {{/consumes.length}}
       {{#formParams}}{{#notFile}}formParams.put("{{baseName}}", ApiInvoker.parameterToString({{paramName}}));{{/notFile}}
       {{/formParams}}
+    {{#consumes.length}}
     }
-
+    {{/consumes.length}}
     try {
       String response = apiInvoker.invokeAPI(basePath, path, "{{httpMethod}}", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
