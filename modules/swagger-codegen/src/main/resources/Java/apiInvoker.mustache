@@ -299,6 +299,9 @@ public class ApiInvoker {
 
           response = builder.type(contentType).put(ClientResponse.class, formParamBuilder.toString());
         }
+        else if(body instanceof FormDataMultiPart) {
+          response = builder.type(contentType).put(ClientResponse.class, body);
+        }
         else
           response = builder.type(contentType).put(ClientResponse.class, serialize(body));
       }
