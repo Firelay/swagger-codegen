@@ -8,6 +8,7 @@ public class CodegenOperation {
   public Boolean hasConsumes, hasProduces, hasParams, returnTypeIsPrimitive,
     returnSimpleType, subresourceOperation, isMapContainer, isListContainer,
     hasMore = Boolean.TRUE;
+  public Boolean isHttpPatch = Boolean.FALSE;
   public String path, operationId, returnType, httpMethod, returnBaseType,
     returnContainer, summary, notes, baseName, defaultResponse;
 

@@ -81,14 +81,15 @@ public class {{classname}} {
     if(contentType.startsWith("multipart/form-data")) {
       boolean hasFields = false;
       FormDataMultiPart mp = new FormDataMultiPart();
-      {{#formParams}}{{#notFile}}
+      {{#formParams}}{{#isHttpPatch}}if({{paramName}} != null){ {{/isHttpPatch}}{{#notFile}}
       hasFields = true;
       mp.field("{{baseName}}", ApiInvoker.parameterToString({{paramName}}), MediaType.MULTIPART_FORM_DATA_TYPE);
       {{/notFile}}{{#isFile}}
       hasFields = true;
       mp.field("{{baseName}}", file.getName());
       mp.bodyPart(new FileDataBodyPart("{{baseName}}", {{paramName}}, MediaType.MULTIPART_FORM_DATA_TYPE));
-      {{/isFile}}{{/formParams}}
+      {{/isFile}}{{#isHttpPatch}} }
+      {{/isHttpPatch}}{{/formParams}}
       if(hasFields)
         postBody = mp;
     }

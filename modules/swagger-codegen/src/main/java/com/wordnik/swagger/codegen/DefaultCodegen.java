@@ -795,28 +795,34 @@ public class DefaultCodegen {
           allParams.add(p);
         }
         if(param instanceof QueryParameter) {
+          p.paramName = "query" + p.paramName;
           p.isQueryParam = new Boolean(true);
           queryParams.add(p.copy());
         }
         else if(param instanceof PathParameter) {
+          //p.paramName = "path" + p.paramName; //breaks paths
           p.required = true;
           p.isPathParam = new Boolean(true);
           pathParams.add(p.copy());
         }
         else if(param instanceof HeaderParameter) {
+          p.paramName = "header" + p.paramName;
           p.isHeaderParam = new Boolean(true);
           headerParams.add(p.copy());
         }
         else if(param instanceof CookieParameter) {
+          p.paramName = "cookie" + p.paramName;
           p.isCookieParam = new Boolean(true);
           cookieParams.add(p.copy());
         }
         else if(param instanceof BodyParameter) {
+          p.paramName = "body" + p.paramName;
           p.isBodyParam = new Boolean(true);
           bodyParam = p;
           bodyParams.add(p.copy());
         }
         else if(param instanceof FormParameter) {
+          p.paramName = "form" + p.paramName;
           if("file".equalsIgnoreCase(((FormParameter)param).getType()))
             p.isFile = true;
           else
@@ -833,6 +839,9 @@ public class DefaultCodegen {
     }
     op.bodyParam = bodyParam;
     op.httpMethod = httpMethod.toUpperCase();
+    if("PATCH".equals(op.httpMethod)){
+    	op.isHttpPatch = true;
+    }
     op.allParams = addHasMore(allParams);
     op.bodyParams = addHasMore(bodyParams);
     op.pathParams = addHasMore(pathParams);
