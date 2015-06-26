@@ -791,9 +791,7 @@ public class DefaultCodegen {
     if(parameters != null) {
       for(Parameter param : parameters) {
         CodegenParameter p = fromParameter(param, imports);
-        if(!allParams.contains(p)){
-          allParams.add(p);
-        }
+        allParams.add(p);
         if(param instanceof QueryParameter) {
           p.paramName = "query" + p.paramName;
           p.isQueryParam = new Boolean(true);
