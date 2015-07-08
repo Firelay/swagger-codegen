@@ -831,6 +831,7 @@ public class DefaultCodegen {
       }
       Collections.sort(queryParams, new CodegenParameterComparator());
       Collections.sort(formParams, new CodegenParameterComparator());
+      Collections.sort(allParams, new CodegenParameterComparator());
     }
     for(String i: imports) {
       if(!defaultIncludes.contains(i) && !languageSpecificPrimitives.contains(i)){
